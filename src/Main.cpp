@@ -16,34 +16,34 @@ int process (jack_nframes_t nframes, void *arg)
     // Clear the output each process cycle.
     jack_midi_clear_buffer(deviceOutputPort);
 
-    // get the port data
+    // You must get the buffer each cycle.
     void* deviceInputPortBuffer = jack_port_get_buffer(deviceInputPort, nframes);
     
-    // get the transport state of the JACK server
-    // transport = jack_transport_query( client, &position );
-    
-    // input: get number of events, and process them.
-    jack_nframes_t event_count = jack_midi_get_event_count(deviceInputPortBuffer);
-    if(event_count > 0)
+    // Get number of events, and process them.
+    jack_nframes_t inputEventCount = jack_midi_get_event_count(deviceInputPortBuffer);
+    if(inputEventCount > 0)
     {
-        printf("Midi\n");
+        for (jack_nframes_t i = 0; i < inputEventCount; i++)
+        {
+            jack_midi_event_t* event;
+            
+            printf("Midi Event\n");
+            int success = jack_midi_event_get(event, deviceInputPortBuffer, i);
+            if (success == 0)
+            {
+                printf("Event: BYTES %lu\n", event->size);
+                // TODO: Copy the event data from the input to the output.
+                if (event->size >= 3)
+                {
+                    printf("Midi Event: BYTES %lu [%0X][%0X][%0X]\n", event->size, event->buffer[0], event->buffer[1], event->buffer[2]);
+                }
+            }
+            else
+            {
+                printf("Midi Event Failure! %i\n", success);
+            }
+        }
     }
-
-    // Copy every input frame to the output.
-    // jack_nframes_t inputEventCount = jack_midi_get_event_count(deviceInputPort);
-    // for (jack_nframes_t i = 0; i < inputEventCount; i++)
-    // {
-    //     jack_midi_event_t* event;
-        
-    //     if (int success = jack_midi_event_get(event, deviceInputPort, i))
-    //     {
-    //        // TODO: Copy the event data from the input to the output.
-    //         if (event->size > 0)
-    //         {
-    //             printf("Midi Event: BYTES %lu [%0X][%0X][%0X]\n", event->size, event->buffer[0], event->buffer[1], event->buffer[2]);
-    //         }
-    //     }
-    // }
 
     return 0;
 }
