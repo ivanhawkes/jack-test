@@ -27,16 +27,66 @@ int process (jack_nframes_t nframes, void *arg)
         {
             jack_midi_event_t* event;
             
-            printf("Midi Event\n");
             int success = jack_midi_event_get(event, deviceInputPortBuffer, i);
             if (success == 0)
             {
-                printf("Event: BYTES %lu\n", event->size);
-                // TODO: Copy the event data from the input to the output.
-                if (event->size >= 3)
+                if (event->size == 1)
                 {
-                    printf("Midi Event: BYTES %lu [%0X][%0X][%0X]\n", event->size, event->buffer[0], event->buffer[1], event->buffer[2]);
+                    // Ignore 0xF8 - seems to be a keep-alive from the Triton.
+                    if (event->buffer[0] != 0xF8)
+                    {
+                        printf("Midi Event: BYTES %lu [%0X]\n", event->size, event->buffer[0]);
+                    }
                 }
+                else if (event->size == 2)
+                {
+                    printf("Midi Event: BYTES %lu [%0X][%0X]\n", event->size, event->buffer[0], event->buffer[1]);
+                }
+                else if (event->size == 3)
+                {
+                    // printf("Midi Event: BYTES %lu [%0X][%0X][%0X]\n", event->size, event->buffer[0], event->buffer[1], event->buffer[2]);
+                }
+                else
+                {
+                    printf("Midi Event: BYTES %lu [%0X][%0X][%0X]...\n", event->size, event->buffer[0], event->buffer[1], event->buffer[2]);
+                }
+
+                // Let's examine the first byte to determine the message type.
+                jack_midi_data_t firstByte = event->buffer[0];
+                jack_midi_data_t channel = firstByte & 0x0F;
+                jack_midi_data_t messageType = (firstByte >> 4) & 0x07;
+
+                switch (messageType)
+                {
+                    case 0:
+                        printf("Note Off:        Chan: [%0X]    Data: [%0X][%0X]\n", channel, event->buffer[1], event->buffer[2]);
+                        break;
+
+                    case 1:
+                        printf("Note On:         Chan: [%0X]    Data: [%0X][%0X]\n", channel, event->buffer[1], event->buffer[2]);
+                        break;
+
+                    case 2:
+                        printf("P. Aftertouch:   Chan: [%0X]    Data: [%0X][%0X]\n", channel, event->buffer[1], event->buffer[2]);
+                        break;
+
+                    case 3:
+                        printf("Control Change:  Chan: [%0X]    Data: [%0X][%0X]\n", channel, event->buffer[1], event->buffer[2]);
+                        break;
+
+                    case 4:
+                        printf("Program Change:  Chan: [%0X]    Data: [%0X][%0X]\n", channel, event->buffer[1], event->buffer[2]);
+                        break;
+
+                    case 5:
+                        printf("C. Aftertouch:   Chan: [%0X]    Data: [%0X][%0X]\n", channel, event->buffer[1], event->buffer[2]);
+                        break;
+
+                    case 6:
+                        printf("Pitch Wheel:     Chan: [%0X]    Data: [%0X][%0X]\n", channel, event->buffer[1], event->buffer[2]);
+                        break;
+                }
+
             }
             else
             {
