@@ -11,13 +11,13 @@ jack_midi_data_t controlValue{0};
 jack_midi_data_t controlValueChange{1};
 
 
-int process(jack_nframes_t frameTime, void *arg)
+int process(jack_nframes_t noOfFrames, void *arg)
 {
 	// You must get the buffer each cycle.
-	void *inputBuffer = jack_port_get_buffer(inputPort, frameTime);
+	void *inputBuffer = jack_port_get_buffer(inputPort, noOfFrames);
 
 	// You must get the buffer each cycle.
-	void *outputBuffer = jack_port_get_buffer(outputPort, frameTime);
+	void *outputBuffer = jack_port_get_buffer(outputPort, noOfFrames);
 
 	// Clear the output each process cycle.
 	jack_midi_clear_buffer(outputBuffer);
@@ -98,49 +98,49 @@ int process(jack_nframes_t frameTime, void *arg)
 						case 0:
 							printf(
 							    "Time: [%0X]    Msg: [%0X]    Note Off:        Chan: [%0X]    Data: [%0X][%0X]\n",
-							    frameTime, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
+							    noOfFrames, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
 							break;
 
 						case 1:
 							printf(
 							    "Time: [%0X]    Msg: [%0X]    Note On:         Chan: [%0X]    Data: [%0X][%0X]\n",
-							    frameTime, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
+							    noOfFrames, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
 							break;
 
 						case 2:
 							printf(
 							    "Time: [%0X]    Msg: [%0X]    P. Aftertouch:   Chan: [%0X]    Data: [%0X][%0X]\n",
-							    frameTime, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
+							    noOfFrames, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
 							break;
 
 						case 3:
 							printf(
 							    "Time: [%0X]    Msg: [%0X]    Control Change:  Chan: [%0X]    Data: [%0X][%0X]\n",
-							    frameTime, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
+							    noOfFrames, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
 							break;
 
 						case 4:
 							printf(
 							    "Time: [%0X]    Msg: [%0X]    Program Change:  Chan: [%0X]    Data: [%0X][%0X]\n",
-							    frameTime, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
+							    noOfFrames, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
 							break;
 
 						case 5:
 							printf(
 							    "Time: [%0X]    Msg: [%0X]    C. Aftertouch:   Chan: [%0X]    Data: [%0X][%0X]\n",
-							    frameTime, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
+							    noOfFrames, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
 							break;
 
 						case 6:
 							printf(
 							    "Time: [%0X]    Msg: [%0X]    Pitch Wheel:     Chan: [%0X]    Data: [%0X][%0X]\n",
-							    frameTime, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
+							    noOfFrames, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
 							break;
 
 						default:
 							printf(
 							    "Time: [%0X]    Msg: [%0X]    Unknown:         Chan: [%0X]    Data: [%0X][%0X]\n",
-							    frameTime, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
+							    noOfFrames, event->buffer[0], channel, event->buffer[1], event->buffer[2]);
 							break;
 					}
 				}
