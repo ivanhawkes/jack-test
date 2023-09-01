@@ -10,7 +10,6 @@ jack_port_t *outputPort;
 jack_client_t *client;
 jack_midi_data_t controlValue{0};
 jack_midi_data_t controlValueChange{1};
-const char **ports;
 bool shouldExitNow{false};
 
 
@@ -226,15 +225,37 @@ int JackInit()
 		return 1;
 	}
 
-	// Get all the ports we opened.
-	ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
+	const char **inPorts = jack_get_ports(client, NULL, JACK_DEFAULT_MIDI_TYPE, 0);
 
-	if (ports == NULL)
+	if (inPorts)
 	{
-		fprintf(stderr, "no physical capture ports\n");
-		shouldExitNow = true;
-		return 1;
+		int i{0};
+		printf("In Port List:\n");
+		while (inPorts[i] != nullptr)
+		{
+			printf("Port Name: %s\n", inPorts[i]);
+			i++;
+		}
+		jack_free(inPorts);
 	}
+
+	// const char **outPorts = jack_get_ports(client, NULL, JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput);
+
+	// if (outPorts)
+	// {
+	// 	int i{0};
+	// 	printf("Out Port List:\n");
+	// 	while (outPorts[i] != nullptr)
+	// 	{
+	// 		printf("Port Name: %s\n", outPorts[i]);
+	// 		i++;
+	// 	}
+	// 	jack_free(outPorts);
+	// }
+
+	jack_connect(client, "alsa_midi:MidiSport 4x4 MIDI 1 (out)", "JackTest:DeviceInput");
+	jack_connect(client, "JackTest:DeviceOutput", "alsa_midi:MidiSport 4x4 MIDI 3 (in)");
+	jack_connect(client, "alsa_midi:MidiSport 4x4 MIDI 1 (out)", "alsa_midi:MidiSport 4x4 MIDI 3 (in)");
 
 	return 0;
 }
@@ -243,8 +264,8 @@ int JackInit()
 void JackExit()
 {
 	// We need to close all the ports by hand.
-	if (ports)
-		jack_free(ports);
+	// if (ports)
+	// 	jack_free(ports);
 
 	// We're finished using Jack. Tell it to cleanup and close down.
 	if (client)
