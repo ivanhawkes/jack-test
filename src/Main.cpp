@@ -190,6 +190,7 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "unique name '%s' assigned.\n", jack_get_client_name(client));
 	}
 
+
 	// Register a device input MIDI port.
 	inputPort = jack_port_register(client, "DeviceInput", JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
 	if (inputPort == NULL)
