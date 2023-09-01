@@ -4,6 +4,7 @@ add_executable(jack_test)
 
 target_sources(jack_test PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/Main.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/MidiHandler.cpp
         )
 
 # In addition to pico_stdlib required for common PicoSDK functionality, give access to double button reboot.
