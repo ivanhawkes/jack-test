@@ -233,7 +233,15 @@ int JackInit()
 		printf("In Port List:\n");
 		while (inPorts[i] != nullptr)
 		{
-			printf("Port Name: %s\n", inPorts[i]);
+			printf("Port Name: %s     ", inPorts[i]);
+
+			jack_port_t *port = jack_port_by_name(client, inPorts[i]);
+			if (port)
+			{
+				int flags = jack_port_flags(port);
+				printf("Flags: %0X\n", flags);
+			}
+
 			i++;
 		}
 		jack_free(inPorts);
